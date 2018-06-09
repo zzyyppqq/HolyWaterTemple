@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity {
                 case R.id.navigation_dashboard:
                     setCurrentNav(NavIndex.TWO);
                     final String s = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test.xls";
-                    Main.smart(s);
+                    Main.write(s);
                     return true;
                 case R.id.navigation_notifications:
                     setCurrentNav(NavIndex.THREE);

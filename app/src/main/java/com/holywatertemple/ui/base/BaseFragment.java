@@ -1,4 +1,4 @@
-package com.holywatertemple.ui.fragment;
+package com.holywatertemple.ui.base;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

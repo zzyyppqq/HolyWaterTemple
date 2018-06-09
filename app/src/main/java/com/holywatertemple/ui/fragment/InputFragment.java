@@ -1,11 +1,9 @@
 package com.holywatertemple.ui.fragment;
 
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 
 import com.holywatertemple.R;
-
-import butterknife.BindView;
+import com.holywatertemple.ui.base.BaseFragment;
 
 /**
  * Created by zhangyiipeng on 2018/6/8.
