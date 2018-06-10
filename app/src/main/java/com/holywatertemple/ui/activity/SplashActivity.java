@@ -45,6 +45,6 @@ public class SplashActivity extends BaseActivity {
             public void run() {
                 MainActivity.jumpActivity(SplashActivity.this, null);
             }
-        }, 1000);
+        }, 100);
     }
 }

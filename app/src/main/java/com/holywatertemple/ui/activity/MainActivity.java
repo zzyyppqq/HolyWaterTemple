@@ -13,13 +13,16 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.holywatertemple.BuildConfig;
+import com.holywatertemple.Config;
 import com.holywatertemple.R;
+import com.holywatertemple.excel.ExcelManger;
 import com.holywatertemple.java_lib.Main;
 import com.holywatertemple.ui.base.BaseActivity;
 import com.holywatertemple.ui.fragment.HomeFragment;
 import com.holywatertemple.ui.fragment.InputFragment;
 import com.holywatertemple.ui.fragment.MessageFragment;
 import com.holywatertemple.util.Logger;
+import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -52,8 +55,6 @@ public class MainActivity extends BaseActivity {
                     return true;
                 case R.id.navigation_dashboard:
                     setCurrentNav(NavIndex.TWO);
-                    final String s = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test.xls";
-                    Main.write(s);
                     return true;
                 case R.id.navigation_notifications:
                     setCurrentNav(NavIndex.THREE);
@@ -71,7 +72,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initView() {
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        setCurrentNav(NavIndex.ONE);
     }
 
     @Override
@@ -81,6 +81,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initData(Bundle savedInstanceState) {
+        setCurrentNav(NavIndex.ONE);
 
     }
 
@@ -91,6 +92,7 @@ public class MainActivity extends BaseActivity {
         int TWO = 1;
         int THREE = 2;
     }
+
     /**
      * 初始化一个值-1 （小于0即可）
      */
@@ -112,6 +114,7 @@ public class MainActivity extends BaseActivity {
                     ft.add(R.id.fl_container, mHomeFragment);
                 } else {
                     ft.show(mHomeFragment);
+                    mHomeFragment.show();
                 }
                 break;
             case NavIndex.TWO:
@@ -154,11 +157,22 @@ public class MainActivity extends BaseActivity {
     }
 
     public static void jumpActivity(Context context, Bundle bundle) {
-        final Intent intent = new Intent(context,MainActivity.class);
+        final Intent intent = new Intent(context, MainActivity.class);
         if (bundle != null) {
             intent.putExtras(bundle);
         }
         context.startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+            // Do anything with file
+            mMessageFragment.onFilePath(filePath);
+        }
     }
 
 }

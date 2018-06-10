@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">圣水寺</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_dashboard">Add</string>
+    <string name="title_notifications">About</string>
     <string name="search">搜索</string>
-    <string name="search_hint">请输入姓名</string>
+    <string name="search_hint">请输入搜索关键字</string>
 </resources>
+
+
+

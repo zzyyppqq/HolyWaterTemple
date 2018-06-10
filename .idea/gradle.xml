@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/java_lib" />
+            <option value="$PROJECT_DIR$/share_lib" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

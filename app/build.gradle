@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
+
+    greendao {
+        schemaVersion 3
+    }
+
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.holywatertemple"
@@ -8,15 +14,25 @@ android {
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
-        vectorDrawables.useSupportLibrary= true
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        dexOptions {
+            // release & debug is in project animators
+            matchingFallbacks = ['release', 'debug']
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -32,4 +48,17 @@ dependencies {
     implementation 'com.squareup.okhttp:okhttp:2.0.0'
     implementation project(':java_lib')
     implementation 'com.google.code.gson:gson:2.7'
+    implementation 'org.greenrobot:greendao:3.2.2'
+    implementation 'net.zetetic:android-database-sqlcipher:3.5.9'
+    implementation 'io.reactivex:rxjava:1.2.0'
+    implementation 'io.reactivex:rxandroid:1.2.1'
+    //stetho
+    implementation 'com.facebook.stetho:stetho:1.4.1'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.4.1'
+    //leakcanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    implementation 'com.nbsp:library:1.8'//文件夹管理
+    implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
+//    implementation project(':share_lib')
 }
