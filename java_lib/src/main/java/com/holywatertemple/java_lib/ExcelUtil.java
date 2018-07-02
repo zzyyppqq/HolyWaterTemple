@@ -27,6 +27,7 @@ public class ExcelUtil {
 
     private static SimpleDateFormat SF_date = new SimpleDateFormat("yyyy年M月d日");
 
+
     public static Table readExcel(String excelFilePath) {
         System.out.println("excel读取开始");
         try {
@@ -166,7 +167,7 @@ public class ExcelUtil {
         }
     }
 
-    private static Date parseDate(String dataStr){
+    public static Date parseDate(String dataStr){
         if (dataStr == null || dataStr.trim().equals("")) {
             return null;
         }else {

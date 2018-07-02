@@ -125,4 +125,44 @@ public class HolyDBManager {
         return null;
 
     }
+
+    public List<PersonData> queryDataByJossTypeAndSearch(String jossType, int type,String like) {
+        if ("所有类型".equals(jossType)){//查询所有类型
+            if (type == ALL) {
+                if (TextUtils.isEmpty(like)){
+                    return personDataDao.queryBuilder().build().forCurrentThread().list();
+                }
+                return personDataDao.queryBuilder().where(PersonDataDao.Properties.FendPrice.like("%" + like + "%")).build().forCurrentThread().list();
+            } else if (type == USE) {
+                if (TextUtils.isEmpty(like)) {
+                    return personDataDao.queryBuilder().where(PersonDataDao.Properties.Name.notEq("")).build().forCurrentThread().list();
+                }
+                return personDataDao.queryBuilder().where(PersonDataDao.Properties.Name.notEq(""),PersonDataDao.Properties.FendPrice.like("%" + like + "%")).build().forCurrentThread().list();
+            } else if (type == NO_USE) {
+                if (TextUtils.isEmpty(like)) {
+                    return personDataDao.queryBuilder().where(PersonDataDao.Properties.Name.eq("")).build().forCurrentThread().list();
+                }
+                return personDataDao.queryBuilder().where(PersonDataDao.Properties.Name.eq(""),PersonDataDao.Properties.FendPrice.like("%" + like + "%")).build().forCurrentThread().list();
+            }
+        }else {
+            if (type == ALL) {
+                if (TextUtils.isEmpty(like)) {
+                    return personDataDao.queryBuilder().where(PersonDataDao.Properties.JossType.eq(jossType)).build().forCurrentThread().list();
+                }
+                return personDataDao.queryBuilder().where(PersonDataDao.Properties.JossType.eq(jossType),PersonDataDao.Properties.FendPrice.like("%" + like + "%")).build().forCurrentThread().list();
+            } else if (type == USE) {
+                if (TextUtils.isEmpty(like)) {
+                    return personDataDao.queryBuilder().where(PersonDataDao.Properties.JossType.eq(jossType), PersonDataDao.Properties.Name.notEq("")).build().forCurrentThread().list();
+                }
+                return personDataDao.queryBuilder().where(PersonDataDao.Properties.JossType.eq(jossType), PersonDataDao.Properties.Name.notEq(""),PersonDataDao.Properties.FendPrice.like("%" + like + "%")).build().forCurrentThread().list();
+            } else if (type == NO_USE) {
+                if (TextUtils.isEmpty(like)) {
+                    return personDataDao.queryBuilder().where(PersonDataDao.Properties.JossType.eq(jossType), PersonDataDao.Properties.Name.eq("")).build().forCurrentThread().list();
+                }
+                return personDataDao.queryBuilder().where(PersonDataDao.Properties.JossType.eq(jossType), PersonDataDao.Properties.Name.eq(""),PersonDataDao.Properties.FendPrice.like("%" + like + "%")).build().forCurrentThread().list();
+            }
+        }
+        return null;
+
+    }
 }

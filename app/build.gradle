@@ -16,19 +16,40 @@ android {
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
     }
+    signingConfigs {
+        debug {
+//            storeFile file("debug.keystore")
+        }
+        release {
+            storeFile file("holy_release")
+            keyAlias 'HolyWaterTemple'
+            storePassword 'HolyWaterTemple'
+            keyPassword 'HolyWaterTemple'
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
+
+            debuggable false
+            zipAlignEnabled false
+            shrinkResources false
             minifyEnabled false
+
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
-        dexOptions {
-            // release & debug is in project animators
-            matchingFallbacks = ['release', 'debug']
-        }
+
         debug {
+//            signingConfig signingConfigs.debug
+//            debuggable true
+//            zipAlignEnabled false
+//            shrinkResources false
             minifyEnabled false
+
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
         }
     }
 }
@@ -58,7 +79,9 @@ dependencies {
     //leakcanary
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
-    implementation 'com.nbsp:library:1.8'//文件夹管理
+    implementation 'com.nbsp:library:1.8'
+    //文件夹管理
     implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
-//    implementation project(':share_lib')
+    //    implementation project(':share_lib')
+
 }

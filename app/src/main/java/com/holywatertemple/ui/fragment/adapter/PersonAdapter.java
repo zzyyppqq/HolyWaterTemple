@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.holywatertemple.R;
 import com.holywatertemple.db.model.PersonData;
+import com.holywatertemple.java_lib.ExcelUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,12 +58,23 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return new PersonViewHolder(view);
     }
 
+    private static final long ONE_YEAR_MS = 360 * 24 * 60 * 60 * 1000;
+    private static final long ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
     @Override
     public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof PersonViewHolder) {
             PersonViewHolder personViewHolder = (PersonViewHolder) holder;
             final PersonData personData = mList.get(position);
             StringBuffer sb = new StringBuffer();
+
+            int remainDay = 0;
+            if (!TextUtils.isEmpty(personData.getFendTime())) {
+                long feedTime = ExcelUtil.parseDate(personData.getFendTime()).getTime();
+                 remainDay = 365 -  (int) ((System.currentTimeMillis() - feedTime ) / ONE_DAY_MS);
+            }
+            personViewHolder.tvRemainDay.setText(remainDay + "天");
+
             sb.append("序         号：" + personData.getJossId()).append("\r\n")
                     .append("姓         名：" + personData.getName()).append("\r\n")
                     .append("供养时间：" + personData.getFendTime()).append("\r\n")
@@ -69,6 +82,7 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     .append("佛像种类：" + personData.getJossType()).append("\r\n")
                     .append("手机号码：" + personData.getPhoneNum()).append("\r\n")
                     .append("供养金额：" + personData.getFendPrice());
+
 
             SpannableString highLightKeyWord = getHighLightKeyWord(Color.parseColor("#FF4081"), sb.toString(), like);
 
@@ -107,6 +121,8 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     static class PersonViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.tv_content)
         TextView tvContent;
+        @BindView(R.id.tv_remain_day)
+        TextView tvRemainDay;
 
         public PersonViewHolder(View itemView) {
             super(itemView);

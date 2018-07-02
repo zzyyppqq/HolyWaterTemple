@@ -1,9 +1,13 @@
 package com.holywatertemple.ui.fragment;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
+import android.telephony.PhoneNumberUtils;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -17,6 +21,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.holywatertemple.BuildConfig;
 import com.holywatertemple.R;
@@ -45,6 +50,9 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView.LEFT_DIRECTION;
+import static com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView.RIGHT_DIRECTION;
 
 /**
  * Created by zhangyiipeng on 2018/6/8.
@@ -100,12 +108,19 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onCreateMenu(SwipeMenu leftMenu, SwipeMenu rightMenu, int viewType) {
                 SwipeMenuItem deleteItem = new SwipeMenuItem(getContext());
-                deleteItem.setWidth((int) DimensUtil.dp2px(getContext(),130f));
-                deleteItem.setHeight((int) DimensUtil.dp2px(getContext(),130f));
+                deleteItem.setWidth((int) DimensUtil.dp2px(getContext(), 130f));
+                deleteItem.setHeight((int) DimensUtil.dp2px(getContext(), 130f));
                 deleteItem.setImage(R.mipmap.delete);
                 deleteItem.setBackgroundColorResource(R.color.gray);
                 // 各种文字和图标属性设置。
                 rightMenu.addMenuItem(deleteItem); // 在Item左侧添加一个菜单。
+
+                SwipeMenuItem phoneItem = new SwipeMenuItem(getContext());
+                phoneItem.setWidth((int) DimensUtil.dp2px(getContext(), 130f));
+                phoneItem.setHeight((int) DimensUtil.dp2px(getContext(), 130f));
+                phoneItem.setText("发送短信");
+                phoneItem.setBackgroundColorResource(R.color.gray);
+                leftMenu.addMenuItem(phoneItem); // 在Item左侧添加一个菜单。
             }
         });
 
@@ -115,13 +130,80 @@ public class HomeFragment extends BaseFragment {
             public void onItemClick(SwipeMenuBridge menuBridge) {
                 // 任何操作必须先关闭菜单，否则可能出现Item菜单打开状态错乱。
                 menuBridge.closeMenu();
-
-                alertDialog(personAdapter.getDatas().get(menuBridge.getAdapterPosition()));
+                int position = menuBridge.getPosition();
+                int direction = menuBridge.getDirection();
+                if (direction == LEFT_DIRECTION) {
+                    alertPhoneDialog(personAdapter.getDatas().get(menuBridge.getAdapterPosition()));
+                } else if (direction == RIGHT_DIRECTION) {
+                    alertDialog(personAdapter.getDatas().get(menuBridge.getAdapterPosition()));
+                }
             }
         });
         personAdapter = new PersonAdapter();
         swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         swipeRecyclerView.setAdapter(personAdapter);
+    }
+
+    private void alertPhoneDialog(final PersonData personData) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity())
+                .setTitle("温馨提示")//设置title
+                .setMessage("是否发送短信给"+personData.getName()+"【" + personData.getPhoneNum() + "】?")//设置要显示的message
+                .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
+                .setPositiveButton("确定", new
+                        DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                String phoneNum = personData.getPhoneNum();
+                                if (phoneNum.trim() == null || phoneNum.trim().equals("")) {
+                                    Toast.makeText(getActivity(), "对不起，手机号不能为空", Toast.LENGTH_SHORT).show();
+                                    return;
+                                } else if (phoneNum.trim() != null && !(phoneNum.trim().equals(""))) {
+//                                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"
+//                                            + phoneNum.trim()));
+//                                    startActivity(intent);
+                                    sendSMS(phoneNum,personData.getName()+"居士您好，您的圣水寺佛像供养快到期啦！");
+
+                                }
+
+
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
+    /**
+     * 直接调用短信接口发短信
+     *
+     * @param phoneNumber
+     * @param message
+     */
+    public void sendSMS(String phoneNumber, String message) {
+        //获取短信管理器
+        android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
+        //拆分短信内容（手机短信长度限制）
+        List<String> divideContents = smsManager.divideMessage(message);
+        for (String text : divideContents) {
+            smsManager.sendTextMessage(phoneNumber, null, text, null, null);
+        }
+    }
+
+    /**
+     * 调起系统发短信功能
+     *
+     * @param phoneNumber
+     * @param message
+     */
+    public void doSendSMSTo(String phoneNumber, String message) {
+        if (PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)) {
+            Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phoneNumber));
+            intent.putExtra("sms_body", message);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -181,7 +263,7 @@ public class HomeFragment extends BaseFragment {
                 Logger.e(TAG, Thread.currentThread().getName());
                 List<PersonData> datas = null;
 
-                datas = HolyDBManager.getInstance(getContext()).queryDataByJossType(jossType, type);
+                datas = HolyDBManager.getInstance(getContext()).queryDataByJossTypeAndSearch(jossType, type, etInput.getText().toString());
 
                 if (datas == null) {
                     subscriber.onError(new Throwable("datas == null"));
