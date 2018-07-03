@@ -17,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:theme="@style/FullScreenTheme"
             android:name=".ui.activity.SplashActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan|stateHidden">

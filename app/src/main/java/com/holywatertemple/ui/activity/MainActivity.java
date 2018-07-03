@@ -1,6 +1,7 @@
 package com.holywatertemple.ui.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
@@ -10,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
@@ -17,6 +19,7 @@ import com.holywatertemple.BuildConfig;
 import com.holywatertemple.Config;
 import com.holywatertemple.R;
 import com.holywatertemple.excel.ExcelManger;
+import com.holywatertemple.excel.HolyDBManager;
 import com.holywatertemple.java_lib.Main;
 import com.holywatertemple.ui.base.BaseActivity;
 import com.holywatertemple.ui.fragment.HomeFragment;
@@ -189,4 +192,29 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        alertExitAppDialog();
+    }
+
+    private void alertExitAppDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this)
+                .setTitle("温馨提示")//设置title
+                .setMessage("是否退出应用？")//设置要显示的message
+                .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
+                .setPositiveButton("确定", new
+                        DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                finish();
+
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
 }

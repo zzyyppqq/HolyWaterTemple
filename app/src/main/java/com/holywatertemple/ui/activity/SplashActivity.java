@@ -42,6 +42,7 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void run() {
                 MainActivity.jumpActivity(SplashActivity.this, null);
+                finish();
             }
         }, 1000);
     }

@@ -1,19 +1,11 @@
 package com.holywatertemple.ui.fragment;
 
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
-import android.telephony.PhoneNumberUtils;
-import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -201,14 +193,14 @@ public class HomeFragment extends BaseFragment {
 
     private void alertPhoneDialog(final PersonData personData) {
         final String sms = AppSharePref.getInstance().getSms();
-        if (TextUtils.isEmpty(sms)){
+        if (TextUtils.isEmpty(sms)) {
             ToastUtil.showToast("短信内容不能为空");
             return;
         }
         final String msg = sms.replace("name", personData.getName());
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity())
                 .setTitle("温馨提示")//设置title
-                .setMessage("是否发送短信给" + personData.getName() + "?\r\n【" + msg+"】")//设置要显示的message
+                .setMessage("是否发送短信给" + personData.getName() + "?\r\n【" + msg + "】")//设置要显示的message
                 .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
                 .setPositiveButton("确定", new
                         DialogInterface.OnClickListener() {
@@ -220,7 +212,7 @@ public class HomeFragment extends BaseFragment {
                                     return;
                                 } else if (phoneNum.trim() != null && !(phoneNum.trim().equals(""))) {
 
-                                    SmsUtil.sendSMS(getActivity(),phoneNum, msg);
+                                    SmsUtil.sendSMS(getActivity(), phoneNum, msg);
                                 }
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -480,7 +472,7 @@ public class HomeFragment extends BaseFragment {
                         personAdapter.setDatas(result, "");
 
                         for (PersonData personData : result) {
-                            Logger.e(TAG, personData.getPhoneNum()+"");
+                            Logger.e(TAG, personData.getPhoneNum() + "");
                             if (!TextUtils.isEmpty(personData.getPhoneNum())) {
                                 HandlerThreadManager.getInstance().sendMsg(personData);
                             }
@@ -556,9 +548,31 @@ public class HomeFragment extends BaseFragment {
                 break;
             case R.id.bt_batch_send_msg:
                 //批量发送短信
-                queryRemainDayDataAndSendSms();
+                alertSendSmsDialog();
                 break;
         }
+    }
+
+    private void alertSendSmsDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity())
+                .setTitle("温馨提示")//设置title
+                .setMessage("是否批量发送短信 ？")//设置要显示的message
+                .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
+                .setPositiveButton("确定", new
+                        DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                queryRemainDayDataAndSendSms();
+
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        alertDialog.show();
     }
 
     private void queryDB() {
