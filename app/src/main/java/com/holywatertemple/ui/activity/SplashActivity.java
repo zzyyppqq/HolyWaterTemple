@@ -13,8 +13,6 @@ import butterknife.BindView;
 
 public class SplashActivity extends BaseActivity {
 
-    @BindView(R.id.tv_content)
-    TextView tvContent;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -45,6 +43,6 @@ public class SplashActivity extends BaseActivity {
             public void run() {
                 MainActivity.jumpActivity(SplashActivity.this, null);
             }
-        }, 100);
+        }, 1000);
     }
 }

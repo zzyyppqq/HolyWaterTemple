@@ -1,13 +1,19 @@
 package com.holywatertemple.ui.fragment;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.telephony.PhoneNumberUtils;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -16,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -27,10 +34,16 @@ import com.holywatertemple.BuildConfig;
 import com.holywatertemple.R;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.excel.HolyDBManager;
+import com.holywatertemple.handler.HandlerThreadManager;
+import com.holywatertemple.java_lib.bean.Person;
 import com.holywatertemple.ui.base.BaseFragment;
+import com.holywatertemple.ui.dialog.EditDialogActivity;
 import com.holywatertemple.ui.fragment.adapter.PersonAdapter;
+import com.holywatertemple.util.AppSharePref;
 import com.holywatertemple.util.DimensUtil;
 import com.holywatertemple.util.Logger;
+import com.holywatertemple.util.SmsUtil;
+import com.holywatertemple.util.ToastUtil;
 import com.yanzhenjie.recyclerview.swipe.SwipeItemClickListener;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenu;
 import com.yanzhenjie.recyclerview.swipe.SwipeMenuBridge;
@@ -51,6 +64,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.holywatertemple.ui.dialog.EditDialogActivity.PERSON_DATA;
 import static com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView.LEFT_DIRECTION;
 import static com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView.RIGHT_DIRECTION;
 
@@ -80,9 +94,14 @@ public class HomeFragment extends BaseFragment {
     TextView tvCount;
     @BindView(R.id.swipeRecyclerView)
     SwipeMenuRecyclerView swipeRecyclerView;
+    @BindView(R.id.bt_batch_send_msg)
+    Button btBatchSendMsg;
+    @BindView(R.id.bt_remain_day_query)
+    Button btRemainDayQuery;
     private PersonAdapter personAdapter;
     private ArrayAdapter<String> adapter;
     private String like;
+    private int mSendSmsDay;
 
     @Override
     protected int getFragmentId() {
@@ -94,6 +113,12 @@ public class HomeFragment extends BaseFragment {
         rbAll.setChecked(true);
 
         initSwipeRecyclerView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        show();
     }
 
     private void initSwipeRecyclerView() {
@@ -108,18 +133,29 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onCreateMenu(SwipeMenu leftMenu, SwipeMenu rightMenu, int viewType) {
                 SwipeMenuItem deleteItem = new SwipeMenuItem(getContext());
-                deleteItem.setWidth((int) DimensUtil.dp2px(getContext(), 130f));
+                deleteItem.setWidth((int) DimensUtil.dp2px(getContext(), 80f));
                 deleteItem.setHeight((int) DimensUtil.dp2px(getContext(), 130f));
-                deleteItem.setImage(R.mipmap.delete);
-                deleteItem.setBackgroundColorResource(R.color.gray);
+                deleteItem.setText("删除");
+                deleteItem.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                deleteItem.setBackgroundColorResource(android.R.color.holo_red_light);
                 // 各种文字和图标属性设置。
                 rightMenu.addMenuItem(deleteItem); // 在Item左侧添加一个菜单。
 
+                SwipeMenuItem editItem = new SwipeMenuItem(getContext());
+                editItem.setWidth((int) DimensUtil.dp2px(getContext(), 80f));
+                editItem.setHeight((int) DimensUtil.dp2px(getContext(), 130f));
+                editItem.setText("编辑");
+                editItem.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                editItem.setBackgroundColorResource(android.R.color.holo_green_light);
+                // 各种文字和图标属性设置。
+                rightMenu.addMenuItem(editItem); // 在Item左侧添加一个菜单。
+
                 SwipeMenuItem phoneItem = new SwipeMenuItem(getContext());
-                phoneItem.setWidth((int) DimensUtil.dp2px(getContext(), 130f));
+                phoneItem.setWidth((int) DimensUtil.dp2px(getContext(), 80f));
                 phoneItem.setHeight((int) DimensUtil.dp2px(getContext(), 130f));
-                phoneItem.setText("发送短信");
-                phoneItem.setBackgroundColorResource(R.color.gray);
+                phoneItem.setText("短信");
+                phoneItem.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+                phoneItem.setBackgroundColorResource(android.R.color.holo_orange_light);
                 leftMenu.addMenuItem(phoneItem); // 在Item左侧添加一个菜单。
             }
         });
@@ -132,22 +168,47 @@ public class HomeFragment extends BaseFragment {
                 menuBridge.closeMenu();
                 int position = menuBridge.getPosition();
                 int direction = menuBridge.getDirection();
+                final PersonData personData = personAdapter.getDatas().get(menuBridge.getAdapterPosition());
                 if (direction == LEFT_DIRECTION) {
-                    alertPhoneDialog(personAdapter.getDatas().get(menuBridge.getAdapterPosition()));
+                    alertPhoneDialog(personData);
                 } else if (direction == RIGHT_DIRECTION) {
-                    alertDialog(personAdapter.getDatas().get(menuBridge.getAdapterPosition()));
+                    if (position == 0) {//删除
+                        alertDeleteDialog(personData);
+                    } else if (position == 1) {//编辑
+                        alertEditDialog(personData);
+                    }
                 }
             }
         });
         personAdapter = new PersonAdapter();
         swipeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         swipeRecyclerView.setAdapter(personAdapter);
+
+        personAdapter.addBtnClickListener(new PersonAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position, PersonData personData) {
+                alertPhoneDialog(personData);
+            }
+        });
+    }
+
+    private void alertEditDialog(PersonData personData) {
+        Person person = personData.convertPerson();
+        final Intent intent = new Intent(getContext(), EditDialogActivity.class);
+        intent.putExtra(PERSON_DATA, person);
+        startActivity(intent);
     }
 
     private void alertPhoneDialog(final PersonData personData) {
+        final String sms = AppSharePref.getInstance().getSms();
+        if (TextUtils.isEmpty(sms)){
+            ToastUtil.showToast("短信内容不能为空");
+            return;
+        }
+        final String msg = sms.replace("name", personData.getName());
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity())
                 .setTitle("温馨提示")//设置title
-                .setMessage("是否发送短信给"+personData.getName()+"【" + personData.getPhoneNum() + "】?")//设置要显示的message
+                .setMessage("是否发送短信给" + personData.getName() + "?\r\n【" + msg+"】")//设置要显示的message
                 .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
                 .setPositiveButton("确定", new
                         DialogInterface.OnClickListener() {
@@ -158,14 +219,9 @@ public class HomeFragment extends BaseFragment {
                                     Toast.makeText(getActivity(), "对不起，手机号不能为空", Toast.LENGTH_SHORT).show();
                                     return;
                                 } else if (phoneNum.trim() != null && !(phoneNum.trim().equals(""))) {
-//                                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"
-//                                            + phoneNum.trim()));
-//                                    startActivity(intent);
-                                    sendSMS(phoneNum,personData.getName()+"居士您好，您的圣水寺佛像供养快到期啦！");
 
+                                    SmsUtil.sendSMS(getActivity(),phoneNum, msg);
                                 }
-
-
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -176,38 +232,35 @@ public class HomeFragment extends BaseFragment {
         alertDialog.show();
     }
 
-    /**
-     * 直接调用短信接口发短信
-     *
-     * @param phoneNumber
-     * @param message
-     */
-    public void sendSMS(String phoneNumber, String message) {
-        //获取短信管理器
-        android.telephony.SmsManager smsManager = android.telephony.SmsManager.getDefault();
-        //拆分短信内容（手机短信长度限制）
-        List<String> divideContents = smsManager.divideMessage(message);
-        for (String text : divideContents) {
-            smsManager.sendTextMessage(phoneNumber, null, text, null, null);
-        }
+
+    private void alertDeleteDialog(final PersonData personData) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity())
+                .setTitle("温馨提示")//设置title
+                .setMessage("是否从供养人中删除【" + personData.getName() + "】?")//设置要显示的message
+                .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
+                .setPositiveButton("确定", new
+                        DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                HolyDBManager.getInstance(getContext()).clearDataWithoutJossId(personData.getJossId());
+                                initData();
+
+                            }
+                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        alertDialog.show();
+
     }
 
-    /**
-     * 调起系统发短信功能
-     *
-     * @param phoneNumber
-     * @param message
-     */
-    public void doSendSMSTo(String phoneNumber, String message) {
-        if (PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)) {
-            Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + phoneNumber));
-            intent.putExtra("sms_body", message);
-            startActivity(intent);
-        }
-    }
 
     @Override
     protected void initData() {
+        mSendSmsDay = AppSharePref.getInstance().getSendSmsDay();
+        btRemainDayQuery.setText("小于" + mSendSmsDay + "天");
         etInput.setText("");
         spinner();
         queryDB();
@@ -345,6 +398,97 @@ public class HomeFragment extends BaseFragment {
 
     }
 
+    private void queryRemainDayData() {
+        Observable.create(new Observable.OnSubscribe<List<PersonData>>() {
+            @Override
+            public void call(Subscriber<? super List<PersonData>> subscriber) {
+                Logger.e(TAG, Thread.currentThread().getName());
+                List<PersonData> datas = null;
+
+                datas = HolyDBManager.getInstance(getContext()).queryDataByRemainDay(mSendSmsDay);
+
+                if (datas == null) {
+                    subscriber.onError(new Throwable("datas == null"));
+                } else {
+                    subscriber.onNext(datas);
+                }
+                subscriber.onCompleted();
+            }
+        }).observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<List<PersonData>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<PersonData> result) {
+                        //加载数据
+                        if (BuildConfig.DEBUG) Logger.e(TAG, result);
+                        Logger.e(TAG, "size: " + result.size());
+                        tvCount.setText(result.size() + "");
+                        personAdapter.setDatas(result, "");
+                    }
+                });
+    }
+
+    private void queryRemainDayDataAndSendSms() {
+        Observable.create(new Observable.OnSubscribe<List<PersonData>>() {
+            @Override
+            public void call(Subscriber<? super List<PersonData>> subscriber) {
+                Logger.e(TAG, Thread.currentThread().getName());
+                List<PersonData> datas = null;
+
+                datas = HolyDBManager.getInstance(getContext()).queryDataByRemainDay(mSendSmsDay);
+
+                if (datas == null) {
+                    subscriber.onError(new Throwable("datas == null"));
+                } else {
+                    subscriber.onNext(datas);
+                }
+                subscriber.onCompleted();
+            }
+        }).observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .unsubscribeOn(Schedulers.io())
+                .subscribe(new Subscriber<List<PersonData>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<PersonData> result) {
+                        //加载数据
+                        if (BuildConfig.DEBUG) Logger.e(TAG, result);
+                        Logger.e(TAG, "size: " + result.size());
+                        tvCount.setText(result.size() + "");
+                        personAdapter.setDatas(result, "");
+
+                        for (PersonData personData : result) {
+                            Logger.e(TAG, personData.getPhoneNum()+"");
+                            if (!TextUtils.isEmpty(personData.getPhoneNum())) {
+                                HandlerThreadManager.getInstance().sendMsg(personData);
+                            }
+                        }
+                    }
+                });
+    }
+
     private int type = ALL;
     public static final int ALL = 1;
     public static final int USE = 2;
@@ -392,7 +536,7 @@ public class HomeFragment extends BaseFragment {
         });
     }
 
-    @OnClick({R.id.rb_all, R.id.rb_use, R.id.rb_no_use})
+    @OnClick({R.id.rb_all, R.id.rb_use, R.id.rb_no_use, R.id.bt_remain_day_query, R.id.bt_batch_send_msg})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.rb_all:
@@ -406,6 +550,13 @@ public class HomeFragment extends BaseFragment {
             case R.id.rb_no_use:
                 type = NO_USE;
                 queryFilterData();
+                break;
+            case R.id.bt_remain_day_query:
+                queryRemainDayData();
+                break;
+            case R.id.bt_batch_send_msg:
+                //批量发送短信
+                queryRemainDayDataAndSendSms();
                 break;
         }
     }
@@ -424,29 +575,6 @@ public class HomeFragment extends BaseFragment {
     }
 
 
-    private void alertDialog(final PersonData personData) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("温馨提示")//设置title
-                .setMessage("是否从供养人中删除【" + personData.getName() + "】?")//设置要显示的message
-                .setCancelable(false)//表示点击dialog其它部分不能取消(除了“取消”，“确定”按钮)
-                .setPositiveButton("确定", new
-                        DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                HolyDBManager.getInstance(getContext()).clearDataWithoutJossId(personData.getJossId());
-                                initData();
-
-                            }
-                        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-        alertDialog.show();
-
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // TODO: inflate a fragment view
@@ -459,5 +587,11 @@ public class HomeFragment extends BaseFragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public void recyclerViewScrollBottom() {
+        if (swipeRecyclerView != null) {
+            swipeRecyclerView.scrollToPosition(personAdapter.getItemCount());
+        }
     }
 }

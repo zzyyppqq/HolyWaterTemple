@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -85,6 +86,12 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    public void setNav(@IdRes int itemId) {
+        if (navigation != null) {
+            navigation.setSelectedItemId(itemId);
+        }
+    }
+
     @IntDef({NavIndex.ONE, NavIndex.TWO, NavIndex.THREE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface NavIndex {
@@ -132,6 +139,7 @@ public class MainActivity extends BaseActivity {
                     ft.add(R.id.fl_container, mMessageFragment);
                 } else {
                     ft.show(mMessageFragment);
+                    mMessageFragment.show();
                 }
                 break;
 
@@ -162,6 +170,12 @@ public class MainActivity extends BaseActivity {
             intent.putExtras(bundle);
         }
         context.startActivity(intent);
+    }
+
+    public void homeRecyclerViewScrollBottom(){
+        if (mHomeFragment != null){
+            mHomeFragment.recyclerViewScrollBottom();
+        }
     }
 
     @Override

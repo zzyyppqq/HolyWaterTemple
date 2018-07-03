@@ -10,11 +10,13 @@ import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.holywatertemple.R;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.java_lib.ExcelUtil;
+import com.holywatertemple.util.AppSharePref;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +29,15 @@ import butterknife.ButterKnife;
 public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-    private OnItemClickListener listener;
+    private OnItemClickListener mItemClickListener;
+    private OnItemClickListener mBtnClickListener;
     private String like;
 
     public void addItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.mItemClickListener = listener;
+    }
+    public void addBtnClickListener(OnItemClickListener listener) {
+        this.mBtnClickListener = listener;
     }
 
     public interface OnItemClickListener {
@@ -68,12 +74,20 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             final PersonData personData = mList.get(position);
             StringBuffer sb = new StringBuffer();
 
-            int remainDay = 0;
-            if (!TextUtils.isEmpty(personData.getFendTime())) {
-                long feedTime = ExcelUtil.parseDate(personData.getFendTime()).getTime();
-                 remainDay = 365 -  (int) ((System.currentTimeMillis() - feedTime ) / ONE_DAY_MS);
+            final int remainDay = personData.getRemainDay();
+
+            if (TextUtils.isEmpty(personData.getName())) {
+                personViewHolder.tvRemainDay.setText("未供养");
+                personViewHolder.btSendSms.setVisibility(View.GONE);
+            } else {
+                personViewHolder.tvRemainDay.setText(remainDay + "天");
+                if (remainDay < AppSharePref.getInstance().getSendSmsDay()) {
+                    personViewHolder.btSendSms.setVisibility(View.VISIBLE);
+                }else {
+                    personViewHolder.btSendSms.setVisibility(View.GONE);
+                }
             }
-            personViewHolder.tvRemainDay.setText(remainDay + "天");
+
 
             sb.append("序         号：" + personData.getJossId()).append("\r\n")
                     .append("姓         名：" + personData.getName()).append("\r\n")
@@ -91,15 +105,24 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (listener != null) {
-                        listener.onItemClick(holder.itemView, position, personData);
+                    if (mItemClickListener != null) {
+                        mItemClickListener.onItemClick(holder.itemView, position, personData);
+                    }
+                }
+            });
+
+            personViewHolder.btSendSms.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mBtnClickListener != null){
+                        mBtnClickListener.onItemClick(holder.itemView, position, personData);
                     }
                 }
             });
         }
     }
 
-    public static SpannableString getHighLightKeyWord(int color, String text,String keyword) {
+    public static SpannableString getHighLightKeyWord(int color, String text, String keyword) {
         SpannableString s = new SpannableString(text);
         Pattern p = Pattern.compile(keyword);
         Matcher m = p.matcher(s);
@@ -123,6 +146,8 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         TextView tvContent;
         @BindView(R.id.tv_remain_day)
         TextView tvRemainDay;
+        @BindView(R.id.bt_send_sms)
+        Button btSendSms;
 
         public PersonViewHolder(View itemView) {
             super(itemView);

@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.holywatertemple.db.DbManager;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.db.model.PersonDataDao;
+import com.holywatertemple.java_lib.ExcelUtil;
 import com.holywatertemple.java_lib.bean.Person;
 import com.holywatertemple.util.Logger;
 
@@ -47,25 +48,36 @@ public class HolyDBManager {
 
 
     public synchronized long insertData(Person person) {
+
         final String json = new Gson().toJson(person);
         final long insert = personDataDao.insert(new PersonData(0,1,person.getJossId(),person.getName(),person.getPhoneNum(),person.getJossType(),
-                person.getFendPrice(),person.getFendTime(),person.getExtendTime(), json));
+                person.getFendPrice(),person.getFendTime(),person.getExtendTime(), getRemainDay(person),json));
         return insert;
     }
 
+    private int getRemainDay(Person person) {
+        int remainDay = 0;
+        if (!TextUtils.isEmpty(person.getFendTime())) {
+            long feedTime = ExcelUtil.parseDate(person.getFendTime()).getTime();
+            remainDay = 365 - (int) ((System.currentTimeMillis() - feedTime) / ONE_DAY_MS);
+        }
+        return remainDay;
+    }
 
 
     public synchronized void updateData(String jossId, Person person) {
+
+
         final String json = new Gson().toJson(person);
         Long id = queryDataByJossId(jossId).getId();
         personDataDao.update(new PersonData(id,0,1,person.getJossId(),person.getName(),person.getPhoneNum(),person.getJossType(),
-                person.getFendPrice(),person.getFendTime(),person.getExtendTime(), json));
+                person.getFendPrice(),person.getFendTime(),person.getExtendTime(), getRemainDay(person),json));
     }
 
     public synchronized void clearDataWithoutJossId(String jossId) {
         Long id = queryDataByJossId(jossId).getId();
         personDataDao.update(new PersonData(id,0,1,jossId,"","","",
-                "","","", ""));
+                "","","",0, ""));
     }
 
     public List<PersonData> queryAllData() {
@@ -164,5 +176,11 @@ public class HolyDBManager {
         }
         return null;
 
+    }
+
+    private static final long ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+    public List<PersonData> queryDataByRemainDay(int sendSmsDay) {
+        return personDataDao.queryBuilder().where(PersonDataDao.Properties.RemainDay.lt(sendSmsDay),PersonDataDao.Properties.Name.notEq("")).build().forCurrentThread().list();
     }
 }

@@ -44,4 +44,20 @@ public class AppSharePref {
         return appSP.getString("table_info","");
     }
 
+
+    public void setSendSmsDay(int day) {
+        SPUtils.putIntSync(appSP, "send_sms_day", day);
+    }
+
+    public int getSendSmsDay(){
+        return appSP.getInt("send_sms_day",30);
+    }
+
+    public void setSms(String sms) {
+        SPUtils.putStringSync(appSP, "sms", sms);
+    }
+
+    public String getSms() {
+        return appSP.getString("sms","尊敬的name居士您好，您供养的圣水寺佛像快到期啦！");
+    }
 }

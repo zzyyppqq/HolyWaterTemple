@@ -1,81 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
 
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/et_input"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:hint="@string/search_hint" />
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="0"
-                android:textSize="18sp"
-                android:layout_alignParentRight="true"/>
 
-        </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioGroup
-                android:id="@+id/radio_group"
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toLeftOf="@+id/spinner"
-                android:orientation="horizontal">
+                android:layout_height="wrap_content">
 
-                <RadioButton
-                    android:id="@+id/rb_all"
+                <EditText
+                    android:id="@+id/et_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:hint="@string/search_hint"/>
+
+                <TextView
+                    android:id="@+id/tv_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="所有" />
+                    android:layout_alignParentRight="true"
+                    android:padding="10dp"
+                    android:text="0"
+                    android:textSize="18sp"/>
 
-                <RadioButton
-                    android:id="@+id/rb_use"
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioGroup
+                    android:id="@+id/radio_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toLeftOf="@+id/spinner"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/rb_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="所有"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_use"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="已供养"/>
+
+                    <RadioButton
+                        android:id="@+id/rb_no_use"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="未供养"/>
+                </RadioGroup>
+
+                <Spinner
+                    android:id="@+id/spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已供养" />
+                    android:layout_alignParentRight="true"
+                    android:minWidth="80dp"
+                    android:padding="5dp"></Spinner>
 
-                <RadioButton
-                    android:id="@+id/rb_no_use"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="未供养" />
-            </RadioGroup>
+            </RelativeLayout>
 
-            <Spinner
-                android:id="@+id/spinner"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:minWidth="80dp"
-                android:padding="5dp"></Spinner>
+        </LinearLayout>
 
-        </RelativeLayout>
+        <com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView
+            android:id="@+id/swipeRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 
-    <com.yanzhenjie.recyclerview.swipe.SwipeMenuRecyclerView
+    <RelativeLayout
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/swipeRecyclerView"/>
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/bt_batch_send_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="批量发送短息"/>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/bt_remain_day_query"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="天数小于30天"/>
+    </RelativeLayout>
+
+</RelativeLayout>

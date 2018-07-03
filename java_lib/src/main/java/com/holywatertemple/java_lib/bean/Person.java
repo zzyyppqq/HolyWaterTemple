@@ -10,8 +10,9 @@ public class Person implements Serializable{
     private String fendPrice;
     private String fendTime;
     private String extendTime;
+    private int remainDay;
 
-    public Person(String jossId, String name, String phoneNum, String jossType, String fendPrice, String fendTime, String extendTime) {
+    public Person(String jossId, String name, String phoneNum, String jossType, String fendPrice, String fendTime, String extendTime,int remainDay) {
         this.jossId = jossId;
         this.name = name;
         this.phoneNum = phoneNum;
@@ -19,6 +20,15 @@ public class Person implements Serializable{
         this.fendPrice = fendPrice;
         this.fendTime = fendTime;
         this.extendTime = extendTime;
+        this.remainDay = remainDay;
+    }
+
+    public int getRemainDay() {
+        return remainDay;
+    }
+
+    public void setRemainDay(int remainDay) {
+        this.remainDay = remainDay;
     }
 
     public String getJossId() {

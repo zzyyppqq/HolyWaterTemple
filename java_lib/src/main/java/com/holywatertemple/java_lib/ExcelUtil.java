@@ -61,7 +61,7 @@ public class ExcelUtil {
                 if (i >= 2 && !jossId.equals("")) {
                     String fendTime = convertDateToStr(sheet.getCell(5, i));
                     String extendTime = convertDateToStr(sheet.getCell(6, i));
-                    Person person = new Person(jossId, name, phoneNum, jossType, fendPrice, fendTime, extendTime);
+                    Person person = new Person(jossId, name, phoneNum, jossType, fendPrice, fendTime, extendTime,0);
                     System.out.println(i + ": " + person.toString());
                     personList.add(person);
                 }

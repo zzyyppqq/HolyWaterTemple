@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.holywatertemple.BuildConfig;
@@ -50,8 +53,20 @@ public class MessageFragment extends BaseFragment {
     Unbinder unbinder;
     @BindView(R.id.bt_export)
     Button btExport;
+    @BindView(R.id.et_remain_day)
+    EditText etRemainDay;
+    @BindView(R.id.bt_save_remain_day)
+    Button btSaveRemainDay;
+    @BindView(R.id.tv_remain_day_show)
+    TextView tvRemainDayShow;
+    @BindView(R.id.et_sms)
+    EditText etSms;
+    @BindView(R.id.bt_save_sms)
+    Button btSaveSms;
+    @BindView(R.id.tv_sms_show)
+    TextView tvSmsShow;
 
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -71,7 +86,10 @@ public class MessageFragment extends BaseFragment {
 
     @Override
     protected void initData() {
-
+        final int remainDay = AppSharePref.getInstance().getSendSmsDay();
+        final String sms = AppSharePref.getInstance().getSms();
+        tvRemainDayShow.setText("剩余天数：" + remainDay+"天");
+        tvSmsShow.setText("发送短信内容 ：" + sms);
     }
 
     @Override
@@ -79,7 +97,7 @@ public class MessageFragment extends BaseFragment {
 
     }
 
-    @OnClick({R.id.bt_import, R.id.bt_export})
+    @OnClick({R.id.bt_import, R.id.bt_export,R.id.bt_save_remain_day,R.id.bt_save_sms})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.bt_import:
@@ -96,12 +114,32 @@ public class MessageFragment extends BaseFragment {
 
                 exportExcel();
                 break;
+            case R.id.bt_save_remain_day:
+
+                final String remainDayStr = etRemainDay.getText().toString();
+                if (!TextUtils.isEmpty(remainDayStr)){
+                    final int remainDay = Integer.valueOf(remainDayStr);
+                    AppSharePref.getInstance().setSendSmsDay(remainDay);
+                    ToastUtil.showToast("保存成功");
+                    tvRemainDayShow.setText("剩余天数：" + remainDay+"天");
+                }
+                break;
+            case R.id.bt_save_sms:
+                final String sms = etSms.getText().toString();
+                if (!TextUtils.isEmpty(sms)){
+                    AppSharePref.getInstance().setSms(sms);
+                    ToastUtil.showToast("保存成功");
+                    tvSmsShow.setText("发送短信内容 ：" + sms);
+                }
+                break;
+
         }
     }
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日h时mm分ss秒");
+
     private void exportExcel() {
-        final String filePath = Config.EXCEL_FILE_EXPORT_PORT_PATH + "person_" + sdf.format(new Date())+ ".xls";
+        final String filePath = Config.EXCEL_FILE_EXPORT_PORT_PATH + "person_" + sdf.format(new Date()) + ".xls";
         ToastUtil.showToast("开始导出数据 :" + filePath);
         ExecutorsManager.getInstance().getFixedThreadPool().execute(new Runnable() {
             @Override
@@ -110,7 +148,7 @@ public class MessageFragment extends BaseFragment {
                 List<Person> personList = new ArrayList<>();
                 for (PersonData personData : allData) {
                     Person person = new Person(personData.getJossId(), personData.getName(), personData.getPhoneNum(), personData.getJossType(),
-                            personData.getFendPrice(), personData.getFendTime(), personData.getExtendTime());
+                            personData.getFendPrice(), personData.getFendTime(), personData.getExtendTime(),0);
                     personList.add(person);
                 }
                 Table table = new Table();
@@ -154,5 +192,9 @@ public class MessageFragment extends BaseFragment {
                 }
             }
         });
+    }
+
+    public void show() {
+        initData();
     }
 }

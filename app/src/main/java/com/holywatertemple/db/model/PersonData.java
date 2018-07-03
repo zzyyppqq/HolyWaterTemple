@@ -1,18 +1,22 @@
 package com.holywatertemple.db.model;
 
+import com.holywatertemple.java_lib.bean.Person;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Property;
 import org.greenrobot.greendao.annotation.Generated;
+
+import java.io.Serializable;
+
 @Entity
-public class PersonData {
+public class PersonData{
     @Id(autoincrement = true)
     private Long id;
     @Property(nameInDb = "type")
     private int type;
     @Property(nameInDb = "version")
     private int version;
-
     @Property(nameInDb = "jossId")
     private String jossId;
     @Property(nameInDb = "name")
@@ -27,12 +31,14 @@ public class PersonData {
     private String fendTime;
     @Property(nameInDb = "extendTime")
     private String extendTime;
+    @Property(nameInDb = "remainDay")
+    private int remainDay;
     @Property(nameInDb = "tableInfo")
     private String tableInfo;
-    @Generated(hash = 1247934409)
+    @Generated(hash = 1545836572)
     public PersonData(Long id, int type, int version, String jossId, String name,
             String phoneNum, String jossType, String fendPrice, String fendTime,
-            String extendTime, String tableInfo) {
+            String extendTime, int remainDay, String tableInfo) {
         this.id = id;
         this.type = type;
         this.version = version;
@@ -43,12 +49,13 @@ public class PersonData {
         this.fendPrice = fendPrice;
         this.fendTime = fendTime;
         this.extendTime = extendTime;
+        this.remainDay = remainDay;
         this.tableInfo = tableInfo;
     }
 
     public PersonData(int type, int version, String jossId, String name,
                       String phoneNum, String jossType, String fendPrice, String fendTime,
-                      String extendTime, String tableInfo) {
+                      String extendTime, int remainDay, String tableInfo) {
         this.type = type;
         this.version = version;
         this.jossId = jossId;
@@ -58,6 +65,7 @@ public class PersonData {
         this.fendPrice = fendPrice;
         this.fendTime = fendTime;
         this.extendTime = extendTime;
+        this.remainDay = remainDay;
         this.tableInfo = tableInfo;
     }
     @Generated(hash = 212076876)
@@ -123,6 +131,12 @@ public class PersonData {
     public void setExtendTime(String extendTime) {
         this.extendTime = extendTime;
     }
+    public int getRemainDay() {
+        return this.remainDay;
+    }
+    public void setRemainDay(int remainDay) {
+        this.remainDay = remainDay;
+    }
     public String getTableInfo() {
         return this.tableInfo;
     }
@@ -131,4 +145,7 @@ public class PersonData {
     }
 
 
+    public Person convertPerson() {
+        return new Person(jossId,name,phoneNum,jossType,fendPrice,fendTime,extendTime,remainDay);
+    }
 }
