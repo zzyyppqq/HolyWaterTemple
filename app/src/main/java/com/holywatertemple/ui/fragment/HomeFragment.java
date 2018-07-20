@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.holywatertemple.BuildConfig;
 import com.holywatertemple.R;
+import com.holywatertemple.app.TempleApplication;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.excel.HolyDBManager;
 import com.holywatertemple.handler.HandlerThreadManager;
@@ -212,7 +213,11 @@ public class HomeFragment extends BaseFragment {
                                     return;
                                 } else if (phoneNum.trim() != null && !(phoneNum.trim().equals(""))) {
 
-                                    SmsUtil.sendSMS(getActivity(), phoneNum, msg);
+                                    if (SmsUtil.isExistSimCard(TempleApplication.getApplication())) {
+                                        SmsUtil.sendSMS(getActivity(), phoneNum, msg);
+                                    }else {
+                                        ToastUtil.showToast("sim不存在");
+                                    }
                                 }
                             }
                         }).setNegativeButton("取消", new DialogInterface.OnClickListener() {

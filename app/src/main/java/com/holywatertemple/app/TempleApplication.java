@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 
 import com.facebook.stetho.Stetho;
+import com.holyWaterTemple.share.ShareManager;
 import com.holywatertemple.BuildConfig;
 import com.holywatertemple.util.PackageUtil;
 import com.squareup.leakcanary.LeakCanary;
@@ -15,11 +16,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+
 /**
  * Created by zhangyiipeng on 2018/6/8.
  */
 
-public class TempleApplication extends Application{
+public class TempleApplication extends Application {
     public static final String TAG = "TempleApplication";
 
     /**
@@ -52,9 +54,14 @@ public class TempleApplication extends Application{
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         }
+        ShareManager.getInstance().init(this);
 
         //如果不是同一个进程return
         if (!PackageUtil.getCurProcessName(this).equals(getPackageName())) return;
+
+
+
+
     }
 
 

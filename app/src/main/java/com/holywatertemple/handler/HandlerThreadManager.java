@@ -66,7 +66,11 @@ public class HandlerThreadManager {
                         }
                         final String message = sms.replace("name", personData.getName());
                         Logger.e(TAG,phoneNum+" , "+message);
-                        SmsUtil.sendSMS(TempleApplication.getApplication(),phoneNum,message);
+                        if (SmsUtil.isExistSimCard(TempleApplication.getApplication())) {
+                            SmsUtil.sendSMS(TempleApplication.getApplication(), phoneNum, message);
+                        }else {
+                            ToastUtil.showToast("sim不存在");
+                        }
 
                         break;
                 }

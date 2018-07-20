@@ -15,10 +15,14 @@ android {
         versionCode 1
         versionName "1.0"
         vectorDrawables.useSupportLibrary = true
+//        multiDexEnabled true
     }
     signingConfigs {
         debug {
-//            storeFile file("debug.keystore")
+            storeFile file('debug.keystore')
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
         }
         release {
             storeFile file("holy_release")
@@ -32,7 +36,7 @@ android {
         release {
             signingConfig signingConfigs.release
 
-            debuggable false
+            debuggable true
             zipAlignEnabled false
             shrinkResources false
             minifyEnabled false
@@ -42,15 +46,20 @@ android {
 
 
         debug {
-//            signingConfig signingConfigs.debug
-//            debuggable true
-//            zipAlignEnabled false
-//            shrinkResources false
+            signingConfig signingConfigs.debug
+            debuggable true
+            zipAlignEnabled false
+            shrinkResources false
             minifyEnabled false
 
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
         }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
 }
 
@@ -83,5 +92,9 @@ dependencies {
     //文件夹管理
     implementation 'com.yanzhenjie:recyclerview-swipe:1.1.4'
     //    implementation project(':share_lib')
+//    debugImplementation 'com.github.whataa:pandora:v1.0.1'
+//    releaseImplementation 'com.github.whataa:pandora-no-op:v1.0.1'
+    implementation project(':share_lib')
+//    implementation 'com.android.support:multidex:1.0.1'
 
 }

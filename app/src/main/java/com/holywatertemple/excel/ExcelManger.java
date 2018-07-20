@@ -48,7 +48,7 @@ public class ExcelManger {
             @Override
             public void call(Subscriber<? super Table> subscriber) {
                 Logger.e(TAG,Thread.currentThread().getName());
-                Table table = ExcelUtil.readExcel(excelFilePath);
+                    Table table = ExcelUtil.readExcel(excelFilePath);
                 if (table == null) {
                     subscriber.onError(new Throwable("table == null"));
                 } else {

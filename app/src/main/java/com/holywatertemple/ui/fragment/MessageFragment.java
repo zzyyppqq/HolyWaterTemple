@@ -10,9 +10,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.holyWaterTemple.share.ShareManager;
 import com.holywatertemple.BuildConfig;
 import com.holywatertemple.Config;
 import com.holywatertemple.R;
@@ -73,6 +73,7 @@ public class MessageFragment extends BaseFragment {
 
         }
     };
+    private String mFilePath;
 
     @Override
     protected int getFragmentId() {
@@ -88,7 +89,7 @@ public class MessageFragment extends BaseFragment {
     protected void initData() {
         final int remainDay = AppSharePref.getInstance().getSendSmsDay();
         final String sms = AppSharePref.getInstance().getSms();
-        tvRemainDayShow.setText("剩余天数：" + remainDay+"天");
+        tvRemainDayShow.setText("剩余天数：" + remainDay + "天");
         tvSmsShow.setText("发送短信内容 ：" + sms);
     }
 
@@ -97,7 +98,7 @@ public class MessageFragment extends BaseFragment {
 
     }
 
-    @OnClick({R.id.bt_import, R.id.bt_export,R.id.bt_save_remain_day,R.id.bt_save_sms})
+    @OnClick({R.id.bt_import, R.id.bt_export, R.id.bt_save_remain_day, R.id.bt_save_sms, R.id.tv_share_wechat_friend, R.id.tv_share_wechat_zoom, R.id.tv_share_wechat_favorite,})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.bt_import:
@@ -112,35 +113,69 @@ public class MessageFragment extends BaseFragment {
                 break;
             case R.id.bt_export:
 
-                exportExcel();
+                exportExcel(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastUtil.showToast("导出数据成功 :" + mFilePath);
+                    }
+                });
                 break;
             case R.id.bt_save_remain_day:
 
                 final String remainDayStr = etRemainDay.getText().toString();
-                if (!TextUtils.isEmpty(remainDayStr)){
+                if (!TextUtils.isEmpty(remainDayStr)) {
                     final int remainDay = Integer.valueOf(remainDayStr);
                     AppSharePref.getInstance().setSendSmsDay(remainDay);
                     ToastUtil.showToast("保存成功");
-                    tvRemainDayShow.setText("剩余天数：" + remainDay+"天");
+                    tvRemainDayShow.setText("剩余天数：" + remainDay + "天");
                 }
                 break;
             case R.id.bt_save_sms:
                 final String sms = etSms.getText().toString();
-                if (!TextUtils.isEmpty(sms)){
+                if (!TextUtils.isEmpty(sms)) {
                     AppSharePref.getInstance().setSms(sms);
                     ToastUtil.showToast("保存成功");
                     tvSmsShow.setText("发送短信内容 ：" + sms);
                 }
+                break;
+            case R.id.tv_share_wechat_friend:
+                exportExcel(new Runnable() {
+                    @Override
+                    public void run() {
+                        ShareManager.getInstance().shareFileToFriend(Config.EXCEL_FILE_EXPORT_PORT_PATH, exportExcelFileName);
+                    }
+                });
+
+                break;
+            case R.id.tv_share_wechat_zoom:
+                exportExcel(new Runnable() {
+                    @Override
+                    public void run() {
+//                        ShareManager.getInstance().shareFileToFriendCircle(Config.EXCEL_FILE_EXPORT_PORT_PATH, exportExcelFileName);
+                        ShareManager.getInstance().shareText();
+                    }
+                });
+                break;
+            case R.id.tv_share_wechat_favorite:
+                exportExcel(new Runnable() {
+                    @Override
+                    public void run() {
+                        ShareManager.getInstance().shareFileToFavorite(Config.EXCEL_FILE_EXPORT_PORT_PATH, exportExcelFileName);
+                    }
+                });
                 break;
 
         }
     }
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日h时mm分ss秒");
+    private String exportExcelFileName = "person_default.xls";
+    private Handler mHandler = new Handler();
 
-    private void exportExcel() {
-        final String filePath = Config.EXCEL_FILE_EXPORT_PORT_PATH + "person_" + sdf.format(new Date()) + ".xls";
-        ToastUtil.showToast("开始导出数据 :" + filePath);
+    private void exportExcel(Runnable runnable) {
+        exportExcelFileName = "圣水寺_" + sdf.format(new Date()) + ".xls";
+        mFilePath = Config.EXCEL_FILE_EXPORT_PORT_PATH + exportExcelFileName;
+        ToastUtil.showToast("开始导出数据 :" + mFilePath);
         ExecutorsManager.getInstance().getFixedThreadPool().execute(new Runnable() {
             @Override
             public void run() {
@@ -148,21 +183,16 @@ public class MessageFragment extends BaseFragment {
                 List<Person> personList = new ArrayList<>();
                 for (PersonData personData : allData) {
                     Person person = new Person(personData.getJossId(), personData.getName(), personData.getPhoneNum(), personData.getJossType(),
-                            personData.getFendPrice(), personData.getFendTime(), personData.getExtendTime(),0);
+                            personData.getFendPrice(), personData.getFendTime(), personData.getExtendTime(), 0);
                     personList.add(person);
                 }
                 Table table = new Table();
                 table.setPersonList(personList);
                 String tableInfo = AppSharePref.getInstance().getTableInfo();
                 table.setHeader(new Gson().fromJson(tableInfo, Header.class));
-                ExcelUtil.writeExcel(filePath, table);
+                ExcelUtil.writeExcel(mFilePath, table);
 
-                btExport.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        ToastUtil.showToast("导出数据成功 :" + filePath);
-                    }
-                });
+                mHandler.post(runnable);
             }
         });
     }
