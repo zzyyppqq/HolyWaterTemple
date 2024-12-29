@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HolyWaterTemple.iml" filepath="$PROJECT_DIR$/HolyWaterTemple.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/java_lib/java_lib.iml" filepath="$PROJECT_DIR$/java_lib/java_lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/share_lib/share_lib.iml" filepath="$PROJECT_DIR$/share_lib/share_lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HolyWaterTemple.iml" filepath="$PROJECT_DIR$/.idea/modules/HolyWaterTemple.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java_lib/HolyWaterTemple.java_lib.iml" filepath="$PROJECT_DIR$/.idea/modules/java_lib/HolyWaterTemple.java_lib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java_lib/HolyWaterTemple.java_lib.main.iml" filepath="$PROJECT_DIR$/.idea/modules/java_lib/HolyWaterTemple.java_lib.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/java_lib/HolyWaterTemple.java_lib.test.iml" filepath="$PROJECT_DIR$/.idea/modules/java_lib/HolyWaterTemple.java_lib.test.iml" />
     </modules>
   </component>
 </project>
