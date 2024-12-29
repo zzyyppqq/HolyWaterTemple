@@ -3,6 +3,7 @@ package com.holywatertemple.ui.dialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,8 +14,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.holywatertemple.BuildConfig;
+
 import com.holywatertemple.R;
+import com.holywatertemple.databinding.ActivityEditDialogBinding;
+import com.holywatertemple.databinding.ActivityMainBinding;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.excel.HolyDBManager;
 import com.holywatertemple.java_lib.bean.Person;
@@ -27,10 +30,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-import butterknife.Unbinder;
-
 /**
  * Created by zhangyiipeng on 2018/7/3.
  */
@@ -38,23 +37,6 @@ import butterknife.Unbinder;
 public class EditDialogActivity extends BaseActivity {
 
     public static final String TAG = InputFragment.class.getSimpleName();
-    @BindView(R.id.spinner)
-    Spinner spinner;
-    @BindView(R.id.tv_feed_time)
-    TextView tvFeedTime;
-    @BindView(R.id.tv_extend_time)
-    TextView tvExtendTime;
-    @BindView(R.id.et_id)
-    EditText etId;
-    @BindView(R.id.et_name)
-    EditText etName;
-    @BindView(R.id.et_phone_num)
-    EditText etPhoneNum;
-    @BindView(R.id.et_feed_price)
-    EditText etFeedPrice;
-    @BindView(R.id.bt_commit)
-    Button btCommit;
-    Unbinder unbinder;
 
     public static final String PERSON_DATA = "person_data";
 
@@ -71,9 +53,16 @@ public class EditDialogActivity extends BaseActivity {
     private String extendTime;
     private Person mPerson;
 
+    private ActivityEditDialogBinding binding;
     @Override
-    protected int getContentViewId() {
-        return R.layout.activity_edit_dialog;
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        binding = ActivityEditDialogBinding.inflate(getLayoutInflater());
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected View getContentView() {
+        return binding.getRoot();
     }
 
     @Override
@@ -90,26 +79,26 @@ public class EditDialogActivity extends BaseActivity {
         }
         spinner();
 
-        etId.setText(mPerson.getJossId());
-        etName.setText(mPerson.getName());
-        etPhoneNum.setText(mPerson.getPhoneNum());
-        etFeedPrice.setText(mPerson.getFendPrice());
+        binding.etId.setText(mPerson.getJossId());
+        binding.etName.setText(mPerson.getName());
+        binding.etPhoneNum.setText(mPerson.getPhoneNum());
+        binding.etFeedPrice.setText(mPerson.getFendPrice());
         final String extendTime = mPerson.getExtendTime();
         if (TextUtils.isEmpty(extendTime)){
-            tvExtendTime.setText("选择日期");
+            binding.tvExtendTime.setText("选择日期");
         }else {
-            tvExtendTime.setText(extendTime);
+            binding.tvExtendTime.setText(extendTime);
         }
         final String fendTime = mPerson.getFendTime();
         if (TextUtils.isEmpty(fendTime)){
-            tvFeedTime.setText("选择日期");
+            binding.tvFeedTime.setText("选择日期");
         }else {
-            tvFeedTime.setText(fendTime);
+            binding.tvFeedTime.setText(fendTime);
         }
         final String jossType = mPerson.getJossType();
         for (int i = 0; i < dataList.size(); i++) {
             if (dataList.get(i).equals(jossType)){
-                spinner.setSelection(i, true);
+                binding.spinner.setSelection(i, true);
                 break;
             }
         }
@@ -118,39 +107,30 @@ public class EditDialogActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
-
-    }
-
-
-    @OnClick({R.id.tv_feed_time, R.id.tv_extend_time, R.id.bt_commit})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tv_feed_time:
-                showDatePickerDialog(tvFeedTime);
-                break;
-            case R.id.tv_extend_time:
-                showDatePickerDialog(tvExtendTime);
-                break;
-            case R.id.bt_commit:
-                if (verty()) {
-                    HolyDBManager.getInstance(this).updateData(jossId, new Person(jossId, name, phoneNum, jossType, feedPrice, fendTime, extendTime,0));
+        binding.tvFeedTime.setOnClickListener(v -> {
+            showDatePickerDialog(binding.tvFeedTime);
+        });
+        binding.tvExtendTime.setOnClickListener(v -> {
+            showDatePickerDialog(binding.tvExtendTime);
+        });
+        binding.btCommit.setOnClickListener(v -> {
+            if (verty()) {
+                HolyDBManager.getInstance(this).updateData(jossId, new Person(jossId, name, phoneNum, jossType, feedPrice, fendTime, extendTime,0));
 //                    clearAllText();
-                    ToastUtil.showToast("编辑成功");
-                    finish();
-                }
-                break;
-            default:
-                break;
-        }
+                ToastUtil.showToast("编辑成功");
+                finish();
+            }
+        });
     }
+
 
     private boolean verty() {
-        jossId = etId.getText().toString();
-        name = etName.getText().toString();
-        phoneNum = etPhoneNum.getText().toString();
-        feedPrice = etFeedPrice.getText().toString();
-        fendTime = tvFeedTime.getText().toString();
-        extendTime = tvExtendTime.getText().toString();
+        jossId = binding.etId.getText().toString();
+        name = binding.etName.getText().toString();
+        phoneNum = binding.etPhoneNum.getText().toString();
+        feedPrice = binding.etFeedPrice.getText().toString();
+        fendTime = binding.tvFeedTime.getText().toString();
+        extendTime = binding.tvExtendTime.getText().toString();
         if ("选择日期".equals(fendTime)){
             fendTime = "";
         }
@@ -206,13 +186,13 @@ public class EditDialogActivity extends BaseActivity {
     }
 
     private void clearAllText() {
-        etFeedPrice.setText("");
-        etPhoneNum.setText("");
-        etId.setText("");
-        etName.setText("");
-        tvExtendTime.setText("");
-        tvFeedTime.setText("选择日期");
-        tvExtendTime.setText("选择日期");
+        binding.etFeedPrice.setText("");
+        binding.etPhoneNum.setText("");
+        binding.etId.setText("");
+        binding.etName.setText("");
+        binding.tvExtendTime.setText("");
+        binding.tvFeedTime.setText("选择日期");
+        binding.tvExtendTime.setText("选择日期");
 
         spinner();
     }
@@ -254,19 +234,19 @@ public class EditDialogActivity extends BaseActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //为spinner绑定我们定义好的数据适配器
-        spinner.setAdapter(adapter);
+        binding.spinner.setAdapter(adapter);
 
         //为spinner绑定监听器，这里我们使用匿名内部类的方式实现监听器
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (BuildConfig.DEBUG) Logger.e(TAG, "您当前选择的是：" + adapter.getItem(position));
+                Logger.e(TAG, "您当前选择的是：" + adapter.getItem(position));
                 jossType = adapter.getItem(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                if (BuildConfig.DEBUG) Logger.e(TAG, "请选择您的城市");
+                Logger.e(TAG, "请选择您的城市");
 
             }
         });

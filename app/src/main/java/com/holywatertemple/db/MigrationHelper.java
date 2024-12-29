@@ -3,7 +3,7 @@ package com.holywatertemple.db;
 import android.database.Cursor;
 import android.text.TextUtils;
 
-import com.holywatertemple.BuildConfig;
+
 import com.holywatertemple.db.model.DaoMaster;
 import com.holywatertemple.util.Logger;
 
@@ -81,11 +81,11 @@ public class MigrationHelper {
                 }
             }
             createTableStringBuilder.append(");");
-            if (BuildConfig.DEBUG) Logger.e("DB_Update" , createTableStringBuilder.toString());
+            Logger.e("DB_Update" , createTableStringBuilder.toString());
 
             db.execSQL(createTableStringBuilder.toString());
 
-            if (BuildConfig.DEBUG) Logger.e("DB_Update" , "create table success");
+            Logger.e("DB_Update" , "create table success");
 
             StringBuilder insertTableStringBuilder = new StringBuilder();
 

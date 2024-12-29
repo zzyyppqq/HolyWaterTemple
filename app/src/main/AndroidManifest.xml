@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.holywatertemple">
+    xmlns:tools="http://schemas.android.com/tools">
+
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -12,20 +13,24 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
 
-    <!--5b1bdd62a40fa35e5d00031f-->
     <application
         android:name=".app.TempleApplication"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/app_icon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/Theme.HolyWaterTemple"
+        tools:targetApi="31">
+
         <activity
             android:theme="@style/FullScreenTheme"
             android:name=".ui.activity.SplashActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan|stateHidden">
+            android:windowSoftInputMode="adjustPan|stateHidden"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -34,12 +39,16 @@
         </activity>
         <activity
             android:name=".ui.activity.MainActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
 
         <activity
             android:name=".ui.dialog.EditDialogActivity"
             android:theme="@style/DialogTheme"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan|stateHidden"/>
+
+
     </application>
 
 </manifest>

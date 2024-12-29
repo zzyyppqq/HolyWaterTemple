@@ -1,22 +1,21 @@
 package com.holywatertemple.ui.base;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 
-import butterknife.ButterKnife;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by zhangyiipeng on 2018/6/8.
  */
 
-public abstract class BaseActivity extends AppCompatActivity{
+public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(getContentViewId());
-        ButterKnife.bind(this);
+        setContentView(getContentView());
 
         initView();
 
@@ -24,10 +23,9 @@ public abstract class BaseActivity extends AppCompatActivity{
 
         initData(savedInstanceState);
 
-
     }
 
-    protected abstract int getContentViewId();
+    protected abstract View getContentView();
 
     protected abstract void initView();
 

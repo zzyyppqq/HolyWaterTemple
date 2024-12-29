@@ -6,11 +6,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 
-import com.facebook.stetho.Stetho;
-import com.holyWaterTemple.share.ShareManager;
-import com.holywatertemple.BuildConfig;
+import com.holywatertemple.share.ShareManager;
+
 import com.holywatertemple.util.PackageUtil;
-import com.squareup.leakcanary.LeakCanary;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,21 +34,21 @@ public class TempleApplication extends Application {
 
         mApplication = this;
 
-        if (BuildConfig.DEBUG) {
-            if (LeakCanary.isInAnalyzerProcess(this)) {
-                // This process is dedicated to LeakCanary for heap analysis.
-                // You should not init your app in this process.
-                return;
-            }
-            LeakCanary.install(this);
+        {
+//            if (LeakCanary.isInAnalyzerProcess(this)) {
+//                // This process is dedicated to LeakCanary for heap analysis.
+//                // You should not init your app in this process.
+//                return;
+//            }
+//            LeakCanary.install(this);
         }
 
-        if (BuildConfig.DEBUG) {
-            Stetho.initializeWithDefaults(this);
+        {
+            //Stetho.initializeWithDefaults(this);
         }
 
         /**打开严苛模式，严苛模式主要检测两大问题，一个是线程策略，即TreadPolicy，另一个是VM策略，即VmPolicy。*/
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         }

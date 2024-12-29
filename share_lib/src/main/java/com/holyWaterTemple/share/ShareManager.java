@@ -1,4 +1,4 @@
-package com.holyWaterTemple.share;
+package com.holywatertemple.share;
 
 import android.content.Context;
 import android.util.Log;

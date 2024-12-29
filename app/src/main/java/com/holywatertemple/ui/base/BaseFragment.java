@@ -1,15 +1,15 @@
 package com.holywatertemple.ui.base;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
+import androidx.fragment.app.Fragment;
+
 
 /**
  * Created by zhangyiipeng on 2018/6/8.
@@ -18,14 +18,11 @@ import butterknife.Unbinder;
 public abstract class BaseFragment extends Fragment {
 
     private View mView;
-    private Unbinder bind;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(getFragmentId(), container, false);
-        bind = ButterKnife.bind(this, mView);
-
+        initBinding(mView);
         initView(savedInstanceState);
         
         initListener();
@@ -39,10 +36,10 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        bind.unbind();
+
     }
 
-
+    protected abstract void initBinding(View view);
 
     protected abstract void initView(Bundle savedInstanceState);
 

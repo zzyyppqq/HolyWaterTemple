@@ -3,7 +3,7 @@ package com.holywatertemple.excel;
 import android.content.Context;
 
 import com.google.gson.Gson;
-import com.holywatertemple.BuildConfig;
+
 import com.holywatertemple.java_lib.ExcelUtil;
 import com.holywatertemple.java_lib.bean.Header;
 import com.holywatertemple.java_lib.bean.Person;
@@ -96,7 +96,7 @@ public class ExcelManger {
                     @Override
                     public void onNext(String result) {
                         //加载数据
-                        if(BuildConfig.DEBUG)Logger.e(TAG,result);
+                        Logger.e(TAG,result);
                     }
                 });
 

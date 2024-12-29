@@ -3,12 +3,15 @@ package com.holywatertemple.ui.activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.TextView;
 
-import com.holywatertemple.R;
-import com.holywatertemple.ui.base.BaseActivity;
+import androidx.annotation.Nullable;
 
-import butterknife.BindView;
+import com.holywatertemple.R;
+import com.holywatertemple.databinding.ActivityEditDialogBinding;
+import com.holywatertemple.databinding.ActivitySplashBinding;
+import com.holywatertemple.ui.base.BaseActivity;
 
 
 public class SplashActivity extends BaseActivity {
@@ -21,9 +24,18 @@ public class SplashActivity extends BaseActivity {
         }
     };
 
+    private ActivitySplashBinding binding;
+
     @Override
-    protected int getContentViewId() {
-        return R.layout.activity_splash;
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        binding = ActivitySplashBinding.inflate(getLayoutInflater());
+        super.onCreate(savedInstanceState);
+    }
+
+
+    @Override
+    protected View getContentView() {
+        return binding.getRoot();
     }
 
     @Override

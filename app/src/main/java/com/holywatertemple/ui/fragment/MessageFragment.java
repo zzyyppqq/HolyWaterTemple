@@ -12,10 +12,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
-import com.holyWaterTemple.share.ShareManager;
-import com.holywatertemple.BuildConfig;
+import com.holywatertemple.share.ShareManager;
+
 import com.holywatertemple.Config;
 import com.holywatertemple.R;
+import com.holywatertemple.databinding.FragmentMessageBinding;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.excel.ExcelManger;
 import com.holywatertemple.excel.HolyDBManager;
@@ -28,7 +29,6 @@ import com.holywatertemple.util.AppSharePref;
 import com.holywatertemple.util.ExecutorsManager;
 import com.holywatertemple.util.Logger;
 import com.holywatertemple.util.ToastUtil;
-import com.nbsp.materialfilepicker.MaterialFilePicker;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,35 +36,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 
 /**
  * Created by zhangyiipeng on 2018/6/8.
  */
 
-public class MessageFragment extends BaseFragment {
+public class MessageFragment extends BaseFragment implements View.OnClickListener {
     public static final String TAG = MessageFragment.class.getSimpleName();
-
-    @BindView(R.id.bt_import)
-    Button btImport;
-    Unbinder unbinder;
-    @BindView(R.id.bt_export)
-    Button btExport;
-    @BindView(R.id.et_remain_day)
-    EditText etRemainDay;
-    @BindView(R.id.bt_save_remain_day)
-    Button btSaveRemainDay;
-    @BindView(R.id.tv_remain_day_show)
-    TextView tvRemainDayShow;
-    @BindView(R.id.et_sms)
-    EditText etSms;
-    @BindView(R.id.bt_save_sms)
-    Button btSaveSms;
-    @BindView(R.id.tv_sms_show)
-    TextView tvSmsShow;
 
     private Handler handler = new Handler() {
         @Override
@@ -74,6 +52,13 @@ public class MessageFragment extends BaseFragment {
         }
     };
     private String mFilePath;
+
+    private FragmentMessageBinding binding;
+
+    @Override
+    protected void initBinding(View view) {
+        binding = FragmentMessageBinding.bind(view);
+    }
 
     @Override
     protected int getFragmentId() {
@@ -89,27 +74,34 @@ public class MessageFragment extends BaseFragment {
     protected void initData() {
         final int remainDay = AppSharePref.getInstance().getSendSmsDay();
         final String sms = AppSharePref.getInstance().getSms();
-        tvRemainDayShow.setText("剩余天数：" + remainDay + "天");
-        tvSmsShow.setText("发送短信内容 ：" + sms);
+        binding.tvRemainDayShow.setText("剩余天数：" + remainDay + "天");
+        binding.tvSmsShow.setText("发送短信内容 ：" + sms);
     }
 
     @Override
     protected void initListener() {
-
+        binding.btImport.setOnClickListener(this);
+        binding.btExport.setOnClickListener(this);
+        binding.btSaveRemainDay.setOnClickListener(this);
+        binding.btSaveSms.setOnClickListener(this);
+        binding.tvShareWechatFriend.setOnClickListener(this);
+        binding.tvShareWechatZoom.setOnClickListener(this);
+        binding.tvShareWechatFavorite.setOnClickListener(this);
     }
 
-    @OnClick({R.id.bt_import, R.id.bt_export, R.id.bt_save_remain_day, R.id.bt_save_sms, R.id.tv_share_wechat_friend, R.id.tv_share_wechat_zoom, R.id.tv_share_wechat_favorite,})
+    //@OnClick({R.id.bt_import, R.id.bt_export, R.id.bt_save_remain_day, R.id.bt_save_sms, R.id.tv_share_wechat_friend, R.id.tv_share_wechat_zoom, R.id.tv_share_wechat_favorite,})
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.bt_import:
 
-                new MaterialFilePicker()
-                        .withActivity(getActivity())
-                        .withRequestCode(1)
-                        .withFilter(Pattern.compile(".*\\.xls")) // Filtering files and directories by file name using regexp
-                        .withFilterDirectories(true) // Set directories filterable (false by default)
-                        .withHiddenFiles(true) // Show hidden files and folders
-                        .start();
+//                new MaterialFilePicker()
+//                        .withActivity(getActivity())
+//                        .withRequestCode(1)
+//                        .withFilter(Pattern.compile(".*\\.xls")) // Filtering files and directories by file name using regexp
+//                        .withFilterDirectories(true) // Set directories filterable (false by default)
+//                        .withHiddenFiles(true) // Show hidden files and folders
+//                        .start();
                 break;
             case R.id.bt_export:
 
@@ -122,20 +114,20 @@ public class MessageFragment extends BaseFragment {
                 break;
             case R.id.bt_save_remain_day:
 
-                final String remainDayStr = etRemainDay.getText().toString();
+                final String remainDayStr = binding.etRemainDay.getText().toString();
                 if (!TextUtils.isEmpty(remainDayStr)) {
                     final int remainDay = Integer.valueOf(remainDayStr);
                     AppSharePref.getInstance().setSendSmsDay(remainDay);
                     ToastUtil.showToast("保存成功");
-                    tvRemainDayShow.setText("剩余天数：" + remainDay + "天");
+                    binding.tvRemainDayShow.setText("剩余天数：" + remainDay + "天");
                 }
                 break;
             case R.id.bt_save_sms:
-                final String sms = etSms.getText().toString();
+                final String sms =  binding.etSms.getText().toString();
                 if (!TextUtils.isEmpty(sms)) {
                     AppSharePref.getInstance().setSms(sms);
                     ToastUtil.showToast("保存成功");
-                    tvSmsShow.setText("发送短信内容 ：" + sms);
+                    binding.tvSmsShow.setText("发送短信内容 ：" + sms);
                 }
                 break;
             case R.id.tv_share_wechat_friend:
@@ -197,18 +189,10 @@ public class MessageFragment extends BaseFragment {
         });
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // TODO: inflate a fragment view
-        View rootView = super.onCreateView(inflater, container, savedInstanceState);
-        unbinder = ButterKnife.bind(this, rootView);
-        return rootView;
-    }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
     }
 
     public void onFilePath(final String filePath) {
@@ -216,7 +200,7 @@ public class MessageFragment extends BaseFragment {
         ExecutorsManager.getInstance().getFixedThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                if (BuildConfig.DEBUG) Logger.e(TAG, filePath);
+                Logger.e(TAG, filePath);
                 if (!TextUtils.isEmpty(filePath)) {
                     ExcelManger.getInstance(getContext()).readExcelDataToDB(filePath);
                 }

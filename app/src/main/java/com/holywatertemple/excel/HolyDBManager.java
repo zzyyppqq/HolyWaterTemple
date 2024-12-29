@@ -13,7 +13,7 @@ import com.holywatertemple.util.Logger;
 
 import java.util.List;
 
-;import static com.holywatertemple.ui.fragment.HomeFragment.ALL;
+import static com.holywatertemple.ui.fragment.HomeFragment.ALL;
 import static com.holywatertemple.ui.fragment.HomeFragment.NO_USE;
 import static com.holywatertemple.ui.fragment.HomeFragment.USE;
 

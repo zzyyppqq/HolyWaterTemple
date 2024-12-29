@@ -3,7 +3,9 @@ package com.holywatertemple.ui.fragment;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,8 +14,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.holywatertemple.BuildConfig;
+
 import com.holywatertemple.R;
+import com.holywatertemple.databinding.FragmentInputBinding;
 import com.holywatertemple.db.model.PersonData;
 import com.holywatertemple.excel.HolyDBManager;
 import com.holywatertemple.java_lib.Main;
@@ -27,34 +30,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 
 /**
  * Created by zhangyiipeng on 2018/6/8.
  */
 
-public class InputFragment extends BaseFragment {
+public class InputFragment extends BaseFragment implements View.OnClickListener {
 
     public static final String TAG = InputFragment.class.getSimpleName();
-    @BindView(R.id.spinner)
-    Spinner spinner;
-    @BindView(R.id.tv_feed_time)
-    TextView tvFeedTime;
-    @BindView(R.id.tv_extend_time)
-    TextView tvExtendTime;
-    @BindView(R.id.et_id)
-    EditText etId;
-    @BindView(R.id.et_name)
-    EditText etName;
-    @BindView(R.id.et_phone_num)
-    EditText etPhoneNum;
-    @BindView(R.id.et_feed_price)
-    EditText etFeedPrice;
-    @BindView(R.id.bt_commit)
-    Button btCommit;
-    Unbinder unbinder;
 
     //定义一个String类型的List数组作为数据源
     private List<String> dataList;
@@ -67,6 +50,13 @@ public class InputFragment extends BaseFragment {
     private String feedPrice;
     private String fendTime;
     private String extendTime;
+
+    private FragmentInputBinding binding;
+
+    @Override
+    protected void initBinding(View view) {
+        binding = FragmentInputBinding.bind(view);
+    }
 
     @Override
     protected int getFragmentId() {
@@ -84,26 +74,30 @@ public class InputFragment extends BaseFragment {
     }
 
 
-    @OnClick({R.id.tv_feed_time, R.id.tv_extend_time, R.id.bt_commit})
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.tv_feed_time:
-                showDatePickerDialog(tvFeedTime);
-                break;
-            case R.id.tv_extend_time:
-                showDatePickerDialog(tvExtendTime);
-                break;
-            case R.id.bt_commit:
-                if (verty()) {
-                    HolyDBManager.getInstance(getContext()).insertData(new Person(jossId, name, phoneNum, jossType, feedPrice, fendTime, extendTime,0));
-                    clearAllText();
-                    ToastUtil.showToast("添加成功");
+    @Override
+    protected void initListener() {
+        binding.tvFeedTime.setOnClickListener(this);
+        binding.tvExtendTime.setOnClickListener(this);
+        binding.btCommit.setOnClickListener(this);
+    }
 
-                    switchHomeFragment();
-                }
-                break;
-            default:
-                break;
+    //@OnClick({R.id.tv_feed_time, R.id.tv_extend_time, R.id.bt_commit})
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.tv_feed_time) {
+            showDatePickerDialog(binding.tvFeedTime);
+        } else if (view.getId() == R.id.tv_extend_time) {
+            showDatePickerDialog(binding.tvExtendTime);
+        } else if (view.getId() == R.id.tv_extend_time) {
+            if (verty()) {
+                HolyDBManager.getInstance(getContext()).insertData(new Person(jossId, name, phoneNum, jossType, feedPrice, fendTime, extendTime, 0));
+                clearAllText();
+                ToastUtil.showToast("添加成功");
+
+                switchHomeFragment();
+            }
+        } else {
+
         }
     }
 
@@ -118,12 +112,12 @@ public class InputFragment extends BaseFragment {
     }
 
     private boolean verty() {
-        jossId = etId.getText().toString();
-        name = etName.getText().toString();
-        phoneNum = etPhoneNum.getText().toString();
-        feedPrice = etFeedPrice.getText().toString();
-        fendTime = tvFeedTime.getText().toString();
-        extendTime = tvExtendTime.getText().toString();
+        jossId = binding.etId.getText().toString();
+        name = binding.etName.getText().toString();
+        phoneNum = binding.etPhoneNum.getText().toString();
+        feedPrice = binding.etFeedPrice.getText().toString();
+        fendTime = binding.tvFeedTime.getText().toString();
+        extendTime = binding.tvExtendTime.getText().toString();
 
         if (TextUtils.isEmpty(jossId)) {
             ToastUtil.showToast("序号不能为空");
@@ -186,13 +180,13 @@ public class InputFragment extends BaseFragment {
 
 
     private void clearAllText() {
-        etFeedPrice.setText("");
-        etPhoneNum.setText("");
-        etId.setText("");
-        etName.setText("");
-        tvExtendTime.setText("");
-        tvFeedTime.setText("选择日期");
-        tvExtendTime.setText("选择日期");
+        binding.etFeedPrice.setText("");
+        binding.etPhoneNum.setText("");
+        binding.etId.setText("");
+        binding.etName.setText("");
+        binding.tvExtendTime.setText("");
+        binding.tvFeedTime.setText("选择日期");
+        binding.tvExtendTime.setText("选择日期");
 
         spinner();
     }
@@ -234,27 +228,22 @@ public class InputFragment extends BaseFragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         //为spinner绑定我们定义好的数据适配器
-        spinner.setAdapter(adapter);
+        binding.spinner.setAdapter(adapter);
 
         //为spinner绑定监听器，这里我们使用匿名内部类的方式实现监听器
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        binding.spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (BuildConfig.DEBUG) Logger.e(TAG, "您当前选择的是：" + adapter.getItem(position));
+                Logger.e(TAG, "您当前选择的是：" + adapter.getItem(position));
                 jossType = adapter.getItem(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                if (BuildConfig.DEBUG) Logger.e(TAG, "请选择您的城市");
+                Logger.e(TAG, "请选择您的城市");
 
             }
         });
-
-    }
-
-    @Override
-    protected void initListener() {
 
     }
 

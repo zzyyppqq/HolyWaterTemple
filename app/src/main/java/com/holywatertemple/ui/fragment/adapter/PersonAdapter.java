@@ -1,8 +1,6 @@
 package com.holywatertemple.ui.fragment.adapter;
 
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -12,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.holywatertemple.R;
 import com.holywatertemple.db.model.PersonData;
@@ -23,8 +24,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -142,16 +141,15 @@ public class PersonAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     static class PersonViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.tv_content)
         TextView tvContent;
-        @BindView(R.id.tv_remain_day)
         TextView tvRemainDay;
-        @BindView(R.id.bt_send_sms)
         Button btSendSms;
 
         public PersonViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this, itemView);
+            tvContent = itemView.findViewById(R.id.tv_content);
+            tvRemainDay = itemView.findViewById(R.id.tv_remain_day);
+            btSendSms = itemView.findViewById(R.id.bt_send_sms);
 
         }
     }

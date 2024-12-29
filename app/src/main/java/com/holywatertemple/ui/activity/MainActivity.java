@@ -1,23 +1,28 @@
 package com.holywatertemple.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.IdRes;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 
-import com.holywatertemple.BuildConfig;
+import androidx.annotation.IdRes;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import com.holywatertemple.Config;
 import com.holywatertemple.R;
+import com.holywatertemple.databinding.ActivityMainBinding;
 import com.holywatertemple.excel.ExcelManger;
 import com.holywatertemple.excel.HolyDBManager;
 import com.holywatertemple.java_lib.Main;
@@ -26,22 +31,15 @@ import com.holywatertemple.ui.fragment.HomeFragment;
 import com.holywatertemple.ui.fragment.InputFragment;
 import com.holywatertemple.ui.fragment.MessageFragment;
 import com.holywatertemple.util.Logger;
-import com.nbsp.materialfilepicker.ui.FilePickerActivity;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import butterknife.BindView;
 
 public class MainActivity extends BaseActivity {
 
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    @BindView(R.id.fl_container)
-    FrameLayout flContainer;
-    @BindView(R.id.navigation)
-    BottomNavigationView navigation;
-
     private HomeFragment mHomeFragment;
     private InputFragment mInputFragment;
     private MessageFragment mMessageFragment;
@@ -53,29 +51,38 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    setCurrentNav(NavIndex.ONE);
-                    return true;
-                case R.id.navigation_dashboard:
-                    setCurrentNav(NavIndex.TWO);
-                    return true;
-                case R.id.navigation_notifications:
-                    setCurrentNav(NavIndex.THREE);
-                    return true;
+            int itemId = item.getItemId();
+            if (itemId == R.id.navigation_home) {
+                setCurrentNav(NavIndex.ONE);
+                return true;
+            } else if (itemId == R.id.navigation_dashboard) {
+                setCurrentNav(NavIndex.TWO);
+                return true;
+            } else if (itemId == R.id.navigation_notifications) {
+                setCurrentNav(NavIndex.THREE);
+                return true;
             }
             return false;
         }
     };
 
+    private ActivityMainBinding binding;
+
     @Override
-    protected int getContentViewId() {
-        return R.layout.activity_main;
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        super.onCreate(savedInstanceState);
     }
 
     @Override
+    protected View getContentView() {
+        return binding.getRoot();
+    }
+
+
+    @Override
     protected void initView() {
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        binding.navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
 
     @Override
@@ -90,8 +97,8 @@ public class MainActivity extends BaseActivity {
     }
 
     public void setNav(@IdRes int itemId) {
-        if (navigation != null) {
-            navigation.setSelectedItemId(itemId);
+        if (binding.navigation != null) {
+            binding.navigation.setSelectedItemId(itemId);
         }
     }
 
@@ -110,7 +117,7 @@ public class MainActivity extends BaseActivity {
 
     public void setCurrentNav(@NavIndex int navIndex) {
         if (curPageIndex == navIndex) {
-            if (BuildConfig.DEBUG) Logger.d(TAG, "点击的是当前的tab，不切换 retrun");
+            Logger.d(TAG, "点击的是当前的tab，不切换 retrun");
             return;
         }
         if (fm == null) fm = getSupportFragmentManager();
@@ -185,12 +192,13 @@ public class MainActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
-            // Do anything with file
-            mMessageFragment.onFilePath(filePath);
-        }
+//        if (requestCode == 1 && resultCode == RESULT_OK) {
+//            String filePath = data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH);
+//            // Do anything with file
+//            mMessageFragment.onFilePath(filePath);
+//        }
     }
+
 
     @Override
     public void onBackPressed() {

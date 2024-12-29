@@ -2,14 +2,14 @@ package com.holywatertemple.util;
 
 import android.util.Log;
 
-import com.holywatertemple.BuildConfig;
+
 
 /**
  * @author wanghaoyue
  */
 public class Logger {
 
-    private static boolean IS_PRINT_LOG = BuildConfig.DEBUG;
+    private static boolean IS_PRINT_LOG = true;
 
     public static void setLoggerSwitch(final boolean isLogOn) {
         IS_PRINT_LOG = isLogOn;

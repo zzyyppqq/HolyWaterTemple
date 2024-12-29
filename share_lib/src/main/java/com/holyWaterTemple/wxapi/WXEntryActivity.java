@@ -1,19 +1,20 @@
-package com.holyWaterTemple.wxapi;
+package com.holywatertemple.wxapi;
 
 
 import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.holyWaterTemple.share.R;
-import com.holyWaterTemple.share.ShareManager;
+import com.holywatertemple.share.R;
+import com.holywatertemple.share.ShareManager;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
-import static com.holyWaterTemple.share.ShareManager.APP_ID;
+import static com.holywatertemple.share.ShareManager.APP_ID;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Created by zhangyiipeng on 2018/7/4.

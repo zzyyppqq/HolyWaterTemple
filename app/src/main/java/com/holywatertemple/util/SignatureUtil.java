@@ -5,7 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
-import com.holywatertemple.BuildConfig;
+
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,17 +16,17 @@ import java.security.NoSuchAlgorithmException;
 
 public class SignatureUtil {
 
-    public static String getAppSignature(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(BuildConfig.APPLICATION_ID, PackageManager.GET_SIGNATURES);
-            String signValidString = getSignValidString(packageInfo.signatures[0].toByteArray());
-            Log.e("获取应用签名", BuildConfig.APPLICATION_ID + "__" + signValidString);
-            return signValidString;
-        } catch (Exception e) {
-            Log.e("获取应用签名", "异常__" + e);
-        }
-        return "";
-    }
+//    public static String getAppSignature(Context context) {
+//        try {
+//            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(BuildConfig.APPLICATION_ID, PackageManager.GET_SIGNATURES);
+//            String signValidString = getSignValidString(packageInfo.signatures[0].toByteArray());
+//            Log.e("获取应用签名", BuildConfig.APPLICATION_ID + "__" + signValidString);
+//            return signValidString;
+//        } catch (Exception e) {
+//            Log.e("获取应用签名", "异常__" + e);
+//        }
+//        return "";
+//    }
 
     private static String getSignValidString(byte[] paramArrayOfByte) throws NoSuchAlgorithmException {
         MessageDigest localMessageDigest = MessageDigest.getInstance("MD5");

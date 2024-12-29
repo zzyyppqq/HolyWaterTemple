@@ -103,7 +103,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:drawablePadding="10dp"
-            android:drawableTop="@mipmap/share_wechat_friend"
+            android:drawableTop="@drawable/share_wechat_friend"
             android:gravity="center"
             android:text="分享给朋友"/>
 
@@ -114,7 +114,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:drawablePadding="10dp"
-            android:drawableTop="@mipmap/share_wechat_zone"
+            android:drawableTop="@drawable/share_wechat_zone"
             android:gravity="center"
             android:text="分享到朋友圈"/>
 
@@ -124,7 +124,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:drawablePadding="10dp"
-            android:drawableTop="@mipmap/share_wechat_zone"
+            android:drawableTop="@drawable/share_wechat_zone"
             android:gravity="center"
             android:text="添加到微信收藏"/>
 
